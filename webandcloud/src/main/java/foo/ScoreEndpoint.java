@@ -39,15 +39,17 @@ import com.google.appengine.api.datastore.Transaction;
 
 @Api(name = "myApi",
      version = "v1",
-     audiences = "927375242383-t21v9ml38tkh2pr30m4hqiflkl3jfohl.apps.googleusercontent.com",
-  	 clientIds = {"927375242383-t21v9ml38tkh2pr30m4hqiflkl3jfohl.apps.googleusercontent.com",
-        "927375242383-jm45ei76rdsfv7tmjv58tcsjjpvgkdje.apps.googleusercontent.com"},
+     audiences = "785074818151-8f2rnkq8vqdtqfpkt0ejde24jog7pim1.apps.googleusercontent.com",
+     clientIds = {
+        "785074818151-8f2rnkq8vqdtqfpkt0ejde24jog7pim1.apps.googleusercontent.com"
+     },
      namespace =
      @ApiNamespace(
 		   ownerDomain = "helloworld.example.com",
 		   ownerName = "helloworld.example.com",
-		   packagePath = "")
-     )
+		   packagePath = ""
+		)
+)
 
 public class ScoreEndpoint {
 
@@ -92,19 +94,14 @@ public class ScoreEndpoint {
 
 	@ApiMethod(name = "myscores", httpMethod = HttpMethod.GET)
 	public List<Entity> myscores(@Named("name") String name) {
-    	Query q = new Query("Score").addSort("score", SortDirection.DESCENDING);
-    
-    	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    	PreparedQuery pq = datastore.prepare(q);
-    	List<Entity> allScores = pq.asList(FetchOptions.Builder.withDefaults());
-    
-    	// Filtrer les scores par nom en mémoire
-    	List<Entity> filteredScores = allScores.stream()
-        	.filter(score -> score.getProperty("name").equals(name))  // Filtrer par le nom
-        	.limit(10)  // Limiter aux 10 meilleurs scores
-        	.collect(Collectors.toList());
-    
-    	return filteredScores;
+		Query q = new Query("Score").setFilter(new FilterPredicate("name", FilterOperator.EQUAL, name)).addSort("score",
+				SortDirection.DESCENDING);
+        //Query q = new Query("Score").setFilter(new FilterPredicate("name", FilterOperator.EQUAL, name));
+
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		PreparedQuery pq = datastore.prepare(q);
+		List<Entity> result = pq.asList(FetchOptions.Builder.withLimit(10));
+		return result;
 	}
 
 	@ApiMethod(name = "addScore", httpMethod = HttpMethod.GET)
