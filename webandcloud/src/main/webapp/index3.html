@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Stupid DiceGame</title>
+<title>DiceGame</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -41,7 +41,7 @@ var DiceGame = {
       this.turn++;
     } else {
       // Enregistrez le score avec le nom d'authentification
-      Score.save(this.score, Login.name); // Utilisez Login.name ici
+      Score.save(this.score, DiceGame.name); // Utilisez Login.name ici
       this.turn = 0;
       this.score = 0;
     }
@@ -67,8 +67,7 @@ var DiceView = {
         class: 'button is-link',
         disabled: Login.name === '',
         onclick: function(e) {
-          DiceGame.play();
-          MyScore.loadList();
+          DiceGame.play()
         }
       }, "play"),
     ]);
@@ -92,7 +91,7 @@ var Score = {
 	    	console.log("saving...",Score.current)
 	        return m.request({
 	            method: "GET",
-	            url: `_ah/api/myApi/v1/addScoreSec/${score}/${name}?access_token=` + Login.token
+              url: "_ah/api/myApi/v1/addScoreSec/"+score+"/"+name
 	        })
 	        .then(function(result) {
 	        	console.log("got:",result)
@@ -187,8 +186,9 @@ var Login = {
     Login.email= responsePayload.email
     Login.ID= response.credential
     Login.url= responsePayload.picture 
-	Login.token= response.credential
+	  Login.token= response.credential
     // external event
+    MyScore.loadList()
     m.redraw()
 }
 
